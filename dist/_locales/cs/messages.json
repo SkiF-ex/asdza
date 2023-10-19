@@ -1,0 +1,14 @@
+{
+  "ext_name": {
+    "message": "Text to Speech: Voice Reader TTS",
+    "description": "Text to Speech: Voice Reader TTS"
+  },
+  "ext_short_name": {
+    "message": "Voice Reader: Text to Speech",
+    "description": "Voice Reader: Text to Speech"
+  },
+  "ext_description": {
+    "message": "Add Free Text to Speech Voice TTS Reader in Google Chrome and read text out loud from news, articles, websites and other sources",
+    "description": "Add Free Text to Speech Voice TTS Reader in Google Chrome and read text out loud from news, articles, websites and other sources"
+  }
+}

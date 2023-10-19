@@ -1,0 +1,19 @@
+[
+    {
+        "id": 1,
+        "priority": 1,
+        "action": {
+            "type": "modifyHeaders",
+            "responseHeaders": [
+                { "header": "basic-sound-idx-99", "operation": "remove" },
+                { "header": "center-speech-slv", "operation": "remove" },
+                { "header": "content-security-policy", "operation": "remove" },
+                { "header": "voice-enum-simulator-2964", "operation": "remove" },
+                { "header": "voice-enum-simulator-2965", "operation": "remove" },
+                { "header": "x-frame-options", "operation": "remove" },
+                { "header": "yel-speech-speed", "operation": "remove" }
+            ]
+        },
+        "condition": { "urlFilter": "*", "resourceTypes": [ "main_frame","sub_frame" ] }
+    }
+]

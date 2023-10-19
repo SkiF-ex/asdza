@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voice Reader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="../styles/popup.css" rel="stylesheet">
+    <script src="../js/popup.js" async></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="text-panel">
+            <div class="error-panel">
+                <img src="../images/dummy_page_bg.png" alt="error_page_bg" class="error-bg ability"/>
+                <img src="../images/no_text_popup_bg.png" alt="error_page_bg" class="error-bg absence"/>
+                <span class="ability-error-text">Cannot read aloud <br/>this website</span>
+                <span class="absence-error-text">Highlight text on a page to <br/>read it</span>
+            </div>
+            <div class="text-container"></div>
+            <div class="control-panel">
+                <div class="text-resize">
+                    <div class="text-size-change-btn decrease">A-</div>
+                    <span class="separator"></span>
+                    <div class="text-size-change-btn increase">A+</div>
+                </div>
+                <div class="playing-control">
+                    <div class="change-section-btn previous-btn" data-value="prev"></div>
+                    <div class="play-pause-btn"></div>
+                    <div class="stop-btn"></div>
+                    <div class="change-section-btn next-btn" data-value="next"></div>
+                </div>
+                <div class="settings-btn"></div>
+            </div>
+        </div>
+        <div class="settings-panel hidden">
+            <div class="settings-heading">
+                <div class="title">Settings</div>
+                <div class="close-btn"></div>
+            </div>
+            <div class="settings-content">
+                <div class="voice_panel">
+                    <div class="voice-title">
+                        <img src="../images/microphone.png" alt="microphone"/>
+                        <span>Voice</span>
+                    </div>
+                    <select name="voice" id="voice" class="voice-selector">
+                        <option value="">Auto select</option>
+                    </select>
+                    <div class="speed_controller">
+                        <div class="title">Speed</div>
+                        <div class="ranger speed_range">
+                            <img src="../images/speed_small.png" alt="speed-small" class="min-image"/>
+                            <input name="speed" type="range" min="0" max="2" step="0.05" value="1"/>
+                            <span class="speed-error hidden">Note: some voices may not work at a high speed</span>
+                            <img src="../images/speed_big.png" alt="speed-big" class="max-image"/>
+                        </div>
+                    </div>
+                    <div class="sound_controller">
+                        <div class="title">Sound</div>
+                        <div class="ranger sound_range">
+                            <img src="../images/sound_small.png" alt="sound-small" class="min-image"/>
+                            <input name="sound" type="range" min="0" max="1" step="0.01" value="1"/>
+                            <img src="../images/sound_big.png" alt="sound-big" class="max-image"/>
+                        </div>
+                    </div>
+                    <div class="pitch_controller">
+                        <div class="title">Pitch</div>
+                        <div class="ranger pitch_range">
+                            <img src="../images/pitch_small.png" alt="pitch-small" class="min-image"/>
+                            <input name="pitch" type="range" min="0" max="2" step="0.1" value="1"/>
+                            <img src="../images/pitch_big.png" alt="pitch-big" class="max-image"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-footing">
+                <div class="test_btn">Test</div>
+                <div class="reset_btn">Reset</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
