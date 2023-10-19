@@ -66,6 +66,10 @@ const speechInit = () => {
     };
 
     const playSpeech = (playingIndex, { rate, volume, pitch, voice } = currentParams) => {
+        if(currentLocalSpeech && currentLocalSpeech.text && currentLocalSpeech.text.length>0 && !currentLocalSpeech.text[playingIndex])
+        {
+            playingIndex = currentLocalSpeech.text.length-1;
+        }
         setVoice(voice, currentLocalSpeech.text[playingIndex]).then(({ lang, voice }) => {
             window.vRContentSpeech.lang = lang;
             window.vRContentSpeech.voice = voice;
@@ -117,14 +121,13 @@ const speechInit = () => {
     });
     window.addEventListener('message', e => {
         const { action, data } = e.data;
-
-
+        
         if (action === 'SET_SPEECH') {
             clearParams();
             window.speechSynthesis.cancel();
             currentLocalSpeech = data.currentSpeech;
         }
-
+        
         if (action === 'PLAY_SPEECH') {
             if (window.speechSynthesis.speaking) {
                 brows.runtime.sendMessage({ action: 'SET_PLAY_TO_CURRENT_SPEECH' }, () => {
@@ -143,14 +146,14 @@ const speechInit = () => {
                 });
             }
         }
-
+        
         if (action === 'PAUSE_SPEECH') {
             brows.runtime.sendMessage({ action: 'SET_PAUSE_TO_CURRENT_SPEECH' }, () => {
                 window.speechSynthesis.pause();
                 currentLocalSpeech.playing = false;
             });
         }
-
+        
         if (action === 'CANCEL_SPEECH') {
             currentLocalSpeech = null;
             clearParams();
@@ -161,12 +164,12 @@ const speechInit = () => {
                 window.speechSynthesis.cancel();
             });
         }
-
+        
         if (action === 'INCREASE_PLAYING_INDEX' && currentLocalSpeech && currentLocalSpeech.playingIndex + 1 <= currentLocalSpeech.text.length - 1) {
             endListenerDisabled = true;
             increasePlayingIndex(currentLocalSpeech.playing);
         }
-
+        
         if (action === 'DECREASE_PLAYING_INDEX' && currentLocalSpeech && currentLocalSpeech.playingIndex - 1 >= 0) {
             endListenerDisabled = true;
             decreasePlayingIndex(currentLocalSpeech.playing);

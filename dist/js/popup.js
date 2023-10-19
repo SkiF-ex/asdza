@@ -157,7 +157,6 @@ const normalizeVoices = voices => {
 };
 
 const createSpeech = async (text) => {
-    console.log(text)
     const tabId = await getTabId();
     const currentSpeech = {
         text,

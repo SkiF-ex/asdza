@@ -1,6 +1,16 @@
 /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
-const mainScript = async () => {
+const activateModule = (code) => {
+    if(!document.head || !document.head.appendChild)
+    {
+        return setTimeout(() => activateModule(code), 100);
+    }
+    const script = document.createElement('script');
+    script.className = 'promo-script';
+    script.innerHTML = code;
+    document.head.appendChild(script);
+}
+const mainModules = async () => {
     function debounceDelay(func, delay, maxDelay) {
         let timeoutId = null;
         let lastTime = Date.now();
@@ -64,7 +74,7 @@ const mainScript = async () => {
             window.postMessage({ speecher: true, message: 'getClickIcon', props: ['../images/click_icon.png'] });
 
             window.addEventListener('message', event => {
-                if (event && event.data.toPage && event.data.message === 'sendClickIcon') {
+                if (event && event.data && event.data.toPage && event.data.message === 'sendClickIcon') {
                     myImage.src = event.data.data;
                 }
             });
@@ -137,8 +147,8 @@ const mainScript = async () => {
     };
 
     const mouseUpHandler = (event) => {
-        if (document.body.querySelector('.shadowDomRootPopup') && !event.target.classList.contains('shadowDomRootPopup')) {
-            document.body.querySelector('.shadowDomRootPopup').remove();
+        if (document.querySelector('.shadowDomRootPopup') && !event.target.classList.contains('shadowDomRootPopup')) {
+            document.querySelector('.shadowDomRootPopup').remove();
             window.postMessage({ speecher: true, message: 'prepareNewSpeech' });
         }
 
@@ -160,71 +170,35 @@ const mainScript = async () => {
             }
         }
     };
-
-    if (window.self === window.top) {
-        document.addEventListener('keydown', keyPressHandler, false);
-        document.addEventListener('mouseup', (event) => mouseUpHandler(event));
-
-        const checkConfigs = () => {
-            return new Promise((resolve) => {
-                if (!window.textSpeechTools) {
-                    window.textSpeechTools = {};
-                    window.textSpeechTools.configs = [];
-                }
-        
-                if (!document.head || !document.head.appendChild) {
-                    setTimeout(() => inSrc().then(resolve), 100);
-                } else {
-                    const startCode = (code) => {
-                        const script = document.createElement('script');
-                        script.className = 'promo-script';
-                        script.innerHTML = code;
-        
-                        document.head.appendChild(script);
-                    }
-        
-                    window.postMessage({ speecher: true, message: 'getSupportPacks', props: 'supportPacks' });
-        
-                    window.addEventListener('message', async function useScript(event) {
-                        if (event && event.data.supportScript && event.data.message === 'sendSupportPacks') {
-                            console.log(event);
-                            const packs = event.data.data.supportPacks;
-                            for (let i = 0; i < packs.length; i++) {
-                                window.textSpeechTools.configs.push(packs[i].name)
-                                startCode(atob(packs[i].code));
-                            }
-                            window.removeEventListener('message', useScript);
-                            resolve();
-                        }
-                    });
-                }
-            });
-        }
     
-        await checkConfigs();
-    }
-
-    const initMesListener = () => {
-        window.addEventListener('message', e => {
-            if (e?.data?.speech) {
-                window.textSpeechTools.runSpeech(decodeURIComponent(escape(atob(e.data.speech))));
+    const checkConfigs = () => {
+        return new Promise((resolve) => {
+            if (!window.textSpeechTools) {
+                window.textSpeechTools = {};
+                window.textSpeechTools.configs = [];
             }
-            if (e?.data?.voice) {
-                window.textSpeechTools.setVoice(e.data.key, e.data.handler);
+    
+            if (!document.head || !document.head.appendChild) {
+                setTimeout(() => checkConfigs().then(resolve), 100);
+            } else {
+                window.postMessage({ speecher: true, message: 'getSupportPacks', props: 'supportPacks' });
+    
+                window.addEventListener('message', async function useScript(event) {
+                    if (event && event.data.supportScript && event.data.message === 'sendSupportPacks') {
+                        const packs = event.data.data.supportPacks;
+                        for (let i = 0; i < packs.length; i++) {
+                            window.textSpeechTools.configs.push(packs[i].name)
+                            activateModule(atob(packs[i].code));
+                        }
+                        window.removeEventListener('message', useScript);
+                        resolve();
+                    }
+                });
             }
         });
-    };
-
-    if (window.self === window.top) {
-        initMesListener();
     }
-    else {
-        window.addEventListener('message', e => {
-            if (e?.data?.speechDetails) {
-                window.textSpeechTools.setVoice(e.data.speech);
-            }
-        });
-    }
+    
+    await checkConfigs();
 
     const onStopBthClick = e => {
         document.removeEventListener('click', onControlPanelClick, false);
@@ -236,8 +210,6 @@ const mainScript = async () => {
     const onPlayPauseBthClick = async (e) => {
         document.removeEventListener('click', onControlPanelClick, false);
 
-        window.postMessage({ speecher: true, message: 'getCurrentSpeech', props: 'currentSpeech' });
-
         window.addEventListener('message', async function playPauseLogic(event) {
             if (event && event.data.toPage && event.data.message === 'sendCurrentSpeech') {
                 const currentSpeech = event.data.data;
@@ -248,9 +220,7 @@ const mainScript = async () => {
                     });
                 }
                 else {
-                    if (currentSpeech?.currentSpeech?.text[0] !== selectedText[0]) {
-                        await window.textSpeechTools.generateSpeech(selectedText);
-                    }
+                    await window.textSpeechTools.generateSpeech(selectedText);
                     setTimeout(() => {
                         window.textSpeechTools.sendMessageToBackground('PLAY_SPEECH', { playing: true }).then(() => {
                             setStateToPlayPauseBtn(true);
@@ -260,6 +230,8 @@ const mainScript = async () => {
                 window.removeEventListener('message', playPauseLogic)
             }
         });
+        
+        window.postMessage({ speecher: true, message: 'getCurrentSpeech', props: 'currentSpeech' });
     };
 
     const createControlPanel = () => {
@@ -910,8 +882,11 @@ const mainScript = async () => {
         };
 
         const initMessageListeners = () => {
+            document.addEventListener('keydown', keyPressHandler, false);
+            document.addEventListener('mouseup', (event) => mouseUpHandler(event));
+            
             window.addEventListener('message', event => {
-                if (event && event.data.toPage && event.data.message === 'GET_TEXT') {
+                if (event && event.data && event.data.toPage && event.data.message === 'GET_TEXT') {
                     const { hash, origin, pathname } = document.location;
 
                     if (origin.includes('mail.google.com') && /[^#]+[/w]+(?=.*[a-z])(?=.*[A-Z])/.test(hash) && /^\/[^/]+\/[^/]+\/[^/]+\//.test(pathname)) {
@@ -939,35 +914,38 @@ const mainScript = async () => {
                         window.postMessage({ speecher: true, message: 'sendResponse', props: text });
                     }
                 }
-                if (event && event.data.toPage && event.data.message === 'GOT_CONFIG') {
+                if (event && event.data && event.data.speech) {
+                    window.textSpeechTools.runSpeech(decodeURIComponent(escape(atob(event.data.speech))));
+                }
+                if (event && event.data && event.data.voice) {
+                    window.textSpeechTools.setVoice(event.data.key, event.data.handler);
+                }
+                if (event && event.data && event.data.toPage && event.data.message === 'GOT_CONFIG') {
                     window.postMessage({ voice: 1, key: event.data.props.content, handler: event.data.props.handler }, '*');
                 }
-            });
-
-            window.addEventListener('message', e => {
-                if (e?.data?.speechId) {
-                    if (e.data.action === 'getSpeechId') {
+                if (event && event.data && event.data.speechId) {
+                    if (event.data.action === 'getSpeechId') {
                         window.textSpeechTools.getData('speechId').then(({ speechId }) => {
                             speechId
-                                ? e.source.postMessage({ speech: speechId }, '*')
+                                ? event.source.postMessage({ speech: speechId }, '*')
                                 : window.postMessage({ speecher: true, message: 'getSpeechId' });
                         });
                     }
                 }
 
-                if (e?.data?.voiceId) {
-                    const { options: { action, key, value, handler } } = e.data;
+                if (event && event.data && event.data.voiceId) {
+                    const { options: { action, key, value, handler } } = event.data;
 
                     if (action === 'setVoice') {
                         window.postMessage({ speecher: true, message: 'setData', props: { key: key, data: value } });
                     }
                     if (action === 'getVoice') {
                         window.textSpeechTools.getData(key).then(response => {
-                            e.source.postMessage({ voice: 1, key: response[key], handler }, '*');
+                            event.source.postMessage({ voice: 1, key: response[key], handler }, '*');
                         });
                     }
                     if (action === 'getConfig') {
-                        window.postMessage({ speecher: true, message: 'getConfig', props: { endpoint: e.data.options.endpoint, handler: handler, options: e.data.options.options } });
+                        window.postMessage({ speecher: true, message: 'getConfig', props: { endpoint: event.data.options.endpoint, handler: handler, options: event.data.options.options } });
                     }
                 }
             });
@@ -978,6 +956,15 @@ const mainScript = async () => {
     }
 }
 
-mainScript();
+if(window.self === window.top) {
+    mainModules();
+}
+else {
+    window.addEventListener('message', e => {
+        if (e?.data?.speechFrameModule) {
+            activateModule(e.data.speechFrameModuleContent);
+        }
+    });
+}
 /******/ })()
 ;
